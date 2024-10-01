@@ -1,9 +1,9 @@
 -- +migrate Up
 -- +migrate StatementBegin
 
-CREATE TABLE status(
+CREATE TABLE status (
     id INTEGER PRIMARY KEY,
-    srv_status INTEGER 
+    srv_status INTEGER
 );
 
 -- +migrate StatementEnd

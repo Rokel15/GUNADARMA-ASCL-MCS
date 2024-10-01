@@ -1,27 +1,31 @@
 package controllers
 
 import (
-	"mcs_bab_7/database"
-	"mcs_bab_7/entities"
-	"mcs_bab_7/repositories"
 	"net/http"
+	"srvo-cntrllr/database"
+	"srvo-cntrllr/entities"
+	"srvo-cntrllr/repositories"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitProj(c *gin.Context) {
-	err := repositories.InitProj(database.DbConnection)
+	var id entities.Status
+
+	err := repositories.InitProj(database.DbConnection, id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, id)
 }
 
 func GetStatus(c *gin.Context) {
 	var result gin.H
+
 	status, err := repositories.GetStatus(database.DbConnection)
 
 	if err != nil {
@@ -39,8 +43,15 @@ func GetStatus(c *gin.Context) {
 
 func UpdateStatus(c *gin.Context) {
 	var status entities.Status
-	srv_status, _ := strconv.Atoi(c.Param("srv_status"))
-	status.SrvStatus = srv_status
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	// err := c.BindJSON(&status)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	status.SrvStatus = id
+
 	err := repositories.UpdateStatus(database.DbConnection, status)
 
 	if err != nil {
@@ -48,5 +59,7 @@ func UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"srvStatus": status.SrvStatus})
+	c.JSON(http.StatusOK, gin.H{
+		"srvStatus": status.SrvStatus,
+	})
 }

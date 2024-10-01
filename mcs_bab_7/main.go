@@ -4,49 +4,45 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"mcs_bab_7/database"
-	"mcs_bab_7/routers"
+	"os"
+	"srvo-cntrllr/database"
+	"srvo-cntrllr/routers"
 
+	"github.com/gin-contrib/cors"
 	_ "github.com/lib/pq"
 )
 
-// input
-// go get -u "github.com/gin-gonic/gin"
-// go get -u "github.com/lib/pq"
-// go get -u "github.com/rubenv/sql-migrate"
-// go get -u "github.com/joho/godotenv"
-
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = ""
-	dbName   = "praktikum_mcs_bab7"
-)
-
-var (
-	DB  *sql.DB
-	err error
-)
-
 func main() {
-	var PORT = ":8080"
+	var PORT = ":" + os.Getenv("PORT")
 
-	psqlInfo := fmt.Sprintf(
-		`host=%s port=%d user=%s password=%s dbname=%s sslmode=disable`,
-		host, port, user, password, dbName,
-	)
+	// psqlInfo := fmt.Sprintf(
+	// 	`host=%s port=%d user=%s password=%s dbname=%s sslmode=disable`,
+	// 	host, port, user, password, dbName,
+	// )
 
-	DB, err = sql.Open("postgres", psqlInfo)
+	psqlInfo := os.Getenv("DATABASE_URL")
+
+	DB, err := sql.Open("postgres", psqlInfo)
 
 	if err != nil {
-		log.Fatal("Error open DB", psqlInfo)
+		log.Fatalf("Error Open DB: %v\n", err)
+	}
+
+	err = DB.Ping()
+	if err != nil {
+		log.Fatalf("Error pinging DB : %v\n", err)
 	}
 
 	database.DBMigrate(DB)
 
 	defer DB.Close()
 
-	routers.StartServer().Run(PORT)
-	fmt.Println("DB Success Connected")
+	// Start server with CORS enabled
+	r := routers.StartServer()
+
+	// Adding CORS middleware with default settings
+	r.Use(cors.Default())
+
+	r.Run(PORT)
+	fmt.Println("berhasil konek...")
 }
