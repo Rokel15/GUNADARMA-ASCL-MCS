@@ -1,406 +1,341 @@
 # **PRAKTIKUM BAB 5**
+
 ## THINGSPEAK
-***
+
+---
 
 ## PENDAHULUAN
 
-Pada praktikum MCS bab 5 akan belajar bagaimana membangun aplikasi yang terhubung 
-dengan thingspeak melalui Application Programming Interface (API). Thingspeak merupakan 
-perangkat lunak bersifat terbuka/layanan yang biasa digunakan untuk project Internet Of 
-Things (IOT) berguna untuk memantau dan mengumnpulkan data atau bahkan perubahan data 
-dengan koneksi API. Aplikasi mengambil data dari API dalam bentuk JSON. JSON memiliki 
-berbagai macam bentuk seperti array of objects, object with nested, object with array dan 
-bentuk lainnya. 
+Pada praktikum MCS bab 5 akan belajar bagaimana membangun aplikasi yang terhubung
+dengan thingspeak melalui Application Programming Interface (API). Thingspeak merupakan
+perangkat lunak bersifat terbuka/layanan yang biasa digunakan untuk project Internet Of
+Things (IOT) berguna untuk memantau dan mengumnpulkan data atau bahkan perubahan data
+dengan koneksi API. Aplikasi mengambil data dari API dalam bentuk JSON. JSON memiliki
+berbagai macam bentuk seperti array of objects, object with nested, object with array dan
+bentuk lainnya.
 
-<div align="center">
-  <br>
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/tanpa_provider.jpg" width="578" height="268"/> 
-</div>
-Tanpa provider proses flow atau alur state panjang karena bussines logic tergabung dengan UI. Penggabungan tersebut akan membuat state harus diturunkan secara manual menggunakan constructor atau widget parameter dari widget induk ke widget anaknya (metode ini disebut prop drilling). Semakin kompleks dan dalam susunan hirarki widget pada suatu aplikasi maka semakin banyak level yang harus di lewati state tersebut meskipun diantaranya tidak membutuhkan state tersebut. Hal akan membuat code menjadi rumit dan sulit untuk di maintenance. Flow di dalamnya pun menjadi tidak efisien.
+**/ss array with nested <br>**
+**/ss object with array <br>**
+**/ss array of object <br>**
 
-<div align="center">
-  <br>
-  <br>
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/dengan_provider.jpg" width="578" height="268"/> 
-</div>
-Sedangkan saat menggunakan provider, bussines logic akan dibuat terpisah dari UI. State akan dikelola secara terpusat sehingga dapat diakses oleh widget manapun tanpa harus melewati widget induk terlebih dahulu. Provider memungkinkan widget untuk mendengar (listen) state yang ada tanpa harus meneruskan data melalui constructor atau parameter.
-<br>
-<br>
-Aplikasi yang akan dibuat pada bab 4 ini adalah aplikasi input data sederhana yang akan menggunakan provider untuk mengelola statenya. Meskipun dapat menginput data, aplikasi ini tidak berfokus pada bagaimana data disimpan seperti pada bab sebelumnya. Sehingga data hanya disimpan pada sebuah List. Fokus dari aplikasi ini adalah bagaimana cara menerapkan dan menggunakan provider untuk mengelola state dengan memisahkan bussines logic dengan UI
-
+</br>
+Interaksi dengan JSON memiliki dua metode yaitu encode dan decode. Encode adalah proses mengubah object menjadi format JSON, contohnya adalah ketika aplikasi membaca data dari API. sedangkan decode adalah kebalikannya yaitu mengubah format JSON menjadi object, contohnya adalah ketika mengirim data (biasanya ke database sebelum diproses dengan query).
 
 ## PENJELASAN & TAHAP-TAHAP
+
 Tampilan aplikasi yang akan di buat
+
 <div align="center">
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/input_screen.jpeg" width="300" height="600"/> 
+  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%205/tampilan%20awal%20aplikasis%20bab%205.jpeg" width="300" height="600"/> 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/detail_screen.jpeg"
+  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%205/tampilan%20awal%20aplikasis%20bab%206.jpeg"
 width="300" height="600" />
 </div>
 
-Buatlah project flutter baru pada android studio dan pilihlah tempat untuk menyimpan project tersebut. Setelah project selesai terbentuk, buatlah beberapa **_file .dart_** di dalam **_folder lib_** dan tambahkan beberapa package berikut ke dalam file **_pubspec.yaml_**
-<div align="center">
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/directory.png"/> 
-  <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%204/pubspec.png"/>
-</div>
+Buat terlebih dahulu folder dan file project msc bab 5 dan tambahkan juga package dio dan provider.
 <br>
+**/gambar file project/**
 
-Buat model sebagai kerangka dari List yang akan menghandle data yang akan di input dengan menambahkan barisan code pada file **_model .dart_**
+Sebelum lanjut menulis code untuk membangun aplikasi, **_buat akun Thingspeak._** <br>
+**/ss regis akun/ <br>**
+**/ss verif email/ <br>**
+**/ss tambah password/ <br>**
+**/ss signup success/ <br>**
 
-``` dart
-import 'dart:io' as io;
+Buka website https://thingspeak.com/ dan _click Get Started For Free_. Isi email address, location dan nama pengguna kemudian _click Continue_. Untuk verifikasi email address Thingspeak akan mengirim instruksi melalui email. Terakhir berikan password untuk akun Thingspeak. <br>
+**/ss buat chanel baru/ <br>**
+**/ss channel fields/ <br>**
+Sebuah akun dari Thingspeak untuk free member dapat membuat 4 channel dan setiap channel memiliki 8 fields. Setiap 1 field menyimpan 1 data, misalnya suhu ruangan yang dibaca oleh sensor dht dan masuk ke micro controller. _Di praktikum ini kita akan membuat 1 channel 3 fields_. 3 fields tersebut akan kita asumsikan sebagai data dari suhu ruangan, kelembaban ruangan dan kelembaban tanah. Berikan nama channel dan deskripsi bebas begitu juga nama dari setiap field namun untuk mempermemudah praktikum dan sebagai tanda maka:
 
-class Model{
-  io.File? image;
-  int? npm;
-  String? name;
-  String? desc;
+1. **field 1** diberi nama **temperature**
+2. **field 2** diberi nama **humidity**
+3. **field 3** diberi nama **soil moisture**
 
-  Model({
-    required this.image,
-    required this.npm,
-    required this.name,
-    required this.desc,
+Jika sudah selesai dibuat akan muncul informasi channel. <br>
+**/ss info channel/** <br>
+Beralih ke menu Api keys dan perhatikan api requestnya <br>
+**/ss menu api keys/** <br>
+Write api keys dan Read api keys adalah kunci yang berbentuk susunan angka dan huruf untuk digabungkan ke endpoint. Write api keys dan Read api keys digenerasikan dari channel yang dibuat pemilik akun. <br>
+**/ss api req/** <br>
+Untuk **mengubah nilai suatu field** menggunakan **endpoint Write metode GET** dengan memasukan nilai baru ke dalam paramater di akhir url. Jika ingin mengubah nilai dari suatu field misalnya field pertama maka bentuk endpoint di akhir url adalah `&filed1=<value>`, jika field kedua maka bentuk endpoint di akhir url adalah `&filed2=<value>`.
+<br><br>
+Isikan 3 field yang sudah dibuat menggunakan endpoint Write
+
+1. **field pertama** diberi nilai **23**
+2. **field kedua** diberi nilai **52**
+3. **field ketiga** diberi nilai **39**
+
+`https://api.thingspeak.com/update?api_key=<Write API Key> &field<nomor field>=<value>`
+
+Endpoint write ini tidak akan ada di dalam aplikasi dan hanya dijalankan untuk inisialisasi nilai field. _Menjalankan endpoint ini bisa menggunakan web browser ataupun menggunakan aplikasi postman._
+
+Endpoint read akan ada di dalam aplikasi. Endpoint read pada umumnya memiliki url bentuk :
+
+`https://api.thingspeak.com/channels/(Channel id)/fields/<nomor field>.json?api_key=Read API Keys&results=2`
+
+dan akan sedikit dirubah menjadi
+
+`https://api.thingspeak.com/channels/(Channel id)/fields/<nomor field>/last.json?api_key=Read API Keys`
+
+Sebelum dimasukkann dan dijalankan di dalam aplikasi jalankan terlebih dahulu di web browser ataupun postman untuk mengambil response dari setiap field.
+<br><br>
+Copy response yang didapatkan, buka link website https://app.quicktype.io/ atur nama model, bahasa yang dipilih bahasa pemrograman Dart gunakan Null Safety dan paste ke dalamnya.
+
+**/ss api response/** <br>
+**/ss quicktype/** <br>
+
+Lakukan konversi untuk semua field kemudian letakkan hasil dari conversi JSON ke dalam file yang berada di folder models, di dalam folder models terdapat 3 file .dart, masing-masing file .dart berisi hasil konversi JSON dari field yang berbeda.
+
+<br><br><br>
+
+Isi dari **_file field1_model.dart_**
+
+```dart
+// To parse this JSON data, do
+//
+//     final field1Model = field1ModelFromJson(jsonString);
+
+import 'dart:convert';
+
+Field1Model field1ModelFromJson(String str) => Field1Model.fromJson(json.decode(str));
+
+String field1ModelToJson(Field1Model data) => json.encode(data.toJson());
+
+class Field1Model {
+  DateTime createdAt;
+  int entryId;
+  String field1;
+
+  Field1Model({
+    required this.createdAt,
+    required this.entryId,
+    required this.field1,
   });
+
+  factory Field1Model.fromJson(Map<String, dynamic> json) => Field1Model(
+    createdAt: DateTime.parse(json["created_at"]),
+    entryId: json["entry_id"],
+    field1: json["field1"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "created_at": createdAt.toIso8601String(),
+    "entry_id": entryId,
+    "field1": field1,
+  };
 }
 ```
 
-Class ini digunakan untuk merepresentasikan data yang nanti akan digunakan atau diinputkan oleh user. Class model ini terdiri dari properti yang berisi nama dari variabel beserta tipe datanya seperti variabel image yang berupa io file (input/output file), npm yang berupa int (angka), serta name dan desc yang merupakan string. Properti ini seperti melakukan inisialisasi variabel untuk data yang akan digunakan nanti sehingga dapat lebih terstruktur dan mudah untuk dimanupulasi
-<br><br>
-Selain properti, terdapat constructor yang menginisialisasi properti ketika ada objek baru dibuat. Ketika sistem akan membuat object baru (dalam contoh kasus ini user menginputkan data baru) constructor ini akan dipanggil dan memastikan semua data terisi karena menggunakan kata kunci required. 
+Isi dari **_file field2_model.dart_**
+
+```dart
+// To parse this JSON data, do
+//
+//     final field2Model = field2ModelFromJson(jsonString);
+
+import 'dart:convert';
+
+Field2Model field2ModelFromJson(String str) => Field2Model.fromJson(json.decode(str));
+
+String field2ModelToJson(Field2Model data) => json.encode(data.toJson());
+
+class Field2Model {
+  DateTime createdAt;
+  int entryId;
+  String field2;
+
+  Field2Model({
+    required this.createdAt,
+    required this.entryId,
+    required this.field2,
+  });
+
+  factory Field2Model.fromJson(Map<String, dynamic> json) => Field2Model(
+    createdAt: DateTime.parse(json["created_at"]),
+    entryId: json["entry_id"],
+    field2: json["field2"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "created_at": createdAt.toIso8601String(),
+    "entry_id": entryId,
+    "field2": field2,
+  };
+}
+```
+
+Isi dari **_file field3_model.dart_**
+
+```dart
+// To parse this JSON data, do
+//
+//     final field3Model = field3ModelFromJson(jsonString);
+
+import 'dart:convert';
+
+Field3Model field3ModelFromJson(String str) => Field3Model.fromJson(json.decode(str));
+
+String field3ModelToJson(Field3Model data) => json.encode(data.toJson());
+
+class Field3Model {
+  DateTime createdAt;
+  int entryId;
+  String field3;
+
+  Field3Model({
+    required this.createdAt,
+    required this.entryId,
+    required this.field3,
+  });
+
+  factory Field3Model.fromJson(Map<String, dynamic> json) => Field3Model(
+    createdAt: DateTime.parse(json["created_at"]),
+    entryId: json["entry_id"],
+    field3: json["field3"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "created_at": createdAt.toIso8601String(),
+    "entry_id": entryId,
+    "field3": field3,
+  };
+}
+```
+
+Dengan adanya model ini dapat membantu aplikasi membaca data saat berkomunikasi dengan API.
+
+<br><br><br>
+
+Kemudian buka **_file api_service.dart_** dan isi dengan kode berikut :
+
+```dart
+import 'package:dio/dio.dart';
+import 'package:mcs_bab_5/models/field1_model.dart';
+import '../models/field2_model.dart';
+import '../models/field3_model.dart';
+
+class ApiService{
+  Dio dio = Dio();
+
+  String readKey = "ILT5CI93S5SHTTF1";
+
+  String field1Url = "https://api.thingspeak.com/channels/2656478/fields/1/last.json?api_key=";
+  String field2Url = "https://api.thingspeak.com/channels/2656478/fields/2/last.json?api_key=";
+  String field3Url = "https://api.thingspeak.com/channels/2656478/fields/3/last.json?api_key=";
+
+  Future<Field1Model> getField1() async{
+      try{
+        final response = await dio.get("$field1Url$readKey");
+        return Field1Model.fromJson(response.data);
+      } catch(e){
+        rethrow;
+      }
+  }
+
+  Future<Field2Model> getField2() async{
+    try{
+      final response = await dio.get("$field2Url$readKey");
+      return Field2Model.fromJson(response.data);
+    } catch(e){
+      rethrow;
+    }
+  }
+
+  Future<Field3Model> getField3() async{
+    try{
+      final response = await dio.get("$field3Url$readKey");
+      return Field3Model.fromJson(response.data);
+    } catch(e){
+      rethrow;
+    }
+  }
+}
+
+```
+
+Kita menggunakan Dio untuk berkomunikasi dengan API dan mendapatkan responsenya di dalam function getField1() getField2() getField3(). Masing-masing method berguna untuk mendapatkan response dari url yang memiliki data field berbeda-beda. Response yang berbeda-beda ditangkap oleh property dari 3 class model yang sudah dibuat. Karena data yang berasal dari endpoint tersebut berbentuk JSON sehingga untuk dapat membacanya harus melalui proses konversi menggunakan property yang ada di class model yaitu fromJson.
 
 <br><br>
-Kemudian buka **_file app_provider.dart_** dan tambahkan kode berikut:
+
+Aplikasi pada praktikum ini diperlukan memasukkan gambar, **cara untuk menambahkan gambar ke aplikasi** yaitu dengan:
+
+1. membuat folder images pada root project
+2. letakkan gambar yang dibutuhkan ke dalam folfer tersebut
+   **/ss folder berisi gambar/**
+3. atur dibagian **pubspec.yaml** dengan menghilangkan comment pada bagian assets. **/ss configure img di pubspec/**
+
+<br><br><br>
+
+Kemudian buka **_file app_provider.dart_** dan isi dengan code berikut :
+
 ```dart
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io' as io;
-import 'package:mcs_bab_4/models/model.dart';
-import 'package:mcs_bab_4/screens/profile_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mcs_bab_5/models/field1_model.dart';
+import 'package:mcs_bab_5/screens/main_screen.dart';
+import 'package:mcs_bab_5/services/api_service.dart';
+import '../models/field2_model.dart';
+import '../models/field3_model.dart';
 
-class AppProvider extends ChangeNotifier{
-  List<Model> data = [];
-  io.File? image;
-  ImagePicker imagePicker = ImagePicker();
-  TextEditingController inputNpmController = TextEditingController();
-  TextEditingController inputNameController = TextEditingController();
-  TextEditingController inputDescController = TextEditingController();
-  String npmLabel = 'Npm :';
-  String nameLabel = 'Name :';
-  String descLabel = 'Desc :';
-  int? index;
-  io.File? imageProfile;
-  int? npm;
-  String? name;
-  String? desc;
+class AppProvider extends ChangeNotifier {
+  TextStyle roboto14Italic = GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w400,);
+  TextStyle roboto14 = GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w500,);
+  TextStyle roboto14SemiBold = GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w600,);
+  TextStyle roboto14Bold = GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w700,);
+  TextStyle roboto16Italic = GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w400,);
+  TextStyle roboto16 = GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500,);
+  TextStyle roboto16SemiBold = GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w600,);
+  TextStyle roboto16Bold = GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w700,);
 
-  @override
-  void dispose(){
-    super.dispose();
-    inputNpmController.dispose();
-    inputNameController.dispose();
-    inputDescController.dispose();
-  }
+  TextStyle whiteRoboto14Bold = GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white);
 
-  imageFromCamera() async{
-    XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
-    io.File image = io.File(pickedFile!.path);
-    this.image = image;
-    notifyListeners();
-  }
+  Color mainColor = const Color(0xff36725D);
+  String loremIpsum =
+  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+  String thermoMeterImage = "images/thermometer.png";
+  String humiditySensorImage = "images/humidity-sensor.png";
+  String soilAnalysisImage = "images/soil-analysis.png";
+  Field1Model? field1model;
+  Field2Model? field2model;
+  Field3Model? field3model;
 
-  imageFromGallery() async{
-    XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    io.File image = io.File(pickedFile!.path);
-    this.image = image;
-    notifyListeners();
-  }
-
-  addData() async{
-    data.add(
-        Model(
-          image: image,
-          npm: int.parse(inputNpmController.text),
-          name: inputNameController.text,
-          desc: inputDescController.text,
-        ));
-    image = null;
-    inputNpmController.text = "";
-    inputNameController.text = "";
-    inputDescController.text = "";
-    notifyListeners();
-  }
-
-  deleteData({
-    required BuildContext context,
-  }) async{
-    await data.removeAt(index!);
-    Navigator.pop(context);
-    notifyListeners();
-  }
-
-  goToProfileScreen({
-    required BuildContext context,
-    required int index,
-    required Model model,
-  }) async{
-    this.index = index;
-    imageProfile = await model.image;
-    npm = await model.npm;
-    name = await model.name;
-    desc = await model.desc;
+  gotoMainScreen({required BuildContext context}){
     Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ProfileScreen(),),
+      context, MaterialPageRoute(builder: (context) => const MainScreen(),),
     );
     notifyListeners();
   }
-}
-```
-Secara garis besar, file ini berisi class dengan nama AppProvider yang berfungsi untuk mengelola bussines logic termasuk state menggunakan ChangeNotifier yang nantinya akan memberi tau widget lain kalau terjadi perubahan state yang nantinya akan mempengaruhi tampilan UI. Class ini juga akan menangani controller dan fungsi dari masing masing widget utama pada aplikasi ini. Blok awal kode merupakan inisialisasi properti seperti inisialisasi List sebagai wadah penyimpanan data inputan user,  nama variabel sampai controller widget. 
-<br><br>
-Blok selanjutnya yaitu method dispose() yang akan menjalankan fungsi pembersihan (dispose) controller dari textfield saat sudah tidak digunakan untuk mencegah kebocoran memori. 
-Penjelasan tiap fungsi/method yang ada:
 
-1. _Method imageFromCamera() yang bersifat asynchronous._ Method ini menangani 
-pengambilan gambar dari kamera. Setelah gambar diambil, gambar tersebut akan 
-disimpan kedalam properti (variabel) image dan memanggil notifyListeners() untuk 
-memberitau widget (disebut: consumer) yang menggunakan method ini bahwa telah 
-terjadi perubahan state.
-2. _Method imageFromGallery()_ memiliki fungsi dan cara kerja yang sama persis seperti 
-method imageFromCamera(), pembedanya adalah method ini memungkinkan 
-pengguna untuk memilih gambar dari aplikasi galeri di perangkat.
-3. _Method addData() bersifat asynchronous._ Method ini berfungsi untuk menangani 
-proses tambah data ke dalam list sesuai dengan struktur list yang sudah di inisialisasi 
-pada model dengan mengambil inputan dari user. Setelah list dibuat, input field akan di 
-reset lagi menjadi kosong.  
-4. _Method deleteData() bersifat asynchronous._ Method ini berfungsi untuk menangani 
-proes hapus data list berdasarkan index Setelah data dihapus, halaman atau screen 
-tersebut akan ditutup menggunakan Navigator.pop(context); 
-5. _Method goToProfileScreen() bersifat asynchronous._ Method ini berfungsi untuk 
-menangani perpindahan halaman ke halaman detail profile. Method ini mengambil data 
-berdasarkan index-nya dan menyinpan ke variabel sementara untuk dibawa ke 
-ProfileScreen menggunakan Navigator.push()
+  Future getTemperature() async{
+    notifyListeners();
+    return field1model = await ApiService().getField1();
+  }
 
-<br><br>
-Selanjutnya tambahkan baris code pada **_file input_screen.dart_** 
-``` dart
-import 'package:flutter/material.dart';
-import 'package:mcs_bab_4/models/model.dart';
-import 'package:mcs_bab_4/providers/app_provider.dart';
-import 'package:provider/provider.dart';
+  Future getHumidity() async{
+    notifyListeners();
+    return field2model = await ApiService().getField2();
+  }
 
-class InputScreen extends StatelessWidget {
-  const InputScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AppProvider>(
-      builder: (context, appProvider, child) {
-        return Scaffold(
-          appBar: AppBar(title: const Text("MCS Bab 4"),),
-          body: ListView(
-            children: [
-              const SizedBox(height: 14,),
-
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width/3,
-                  height: MediaQuery.of(context).size.width/3,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Colors.black, width: 1,),
-                    // color: Colors.red,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: appProvider.image != null?
-                    Image.file(appProvider.image!, fit: BoxFit.fill,) :
-                    const Center(child: Text("upload photo")),
-                  )
-                ),
-              ),
-
-              const SizedBox(height: 14,),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    child: const Icon(Icons.camera),
-                    onTap: () async{await appProvider.imageFromCamera();},
-                  ),
-                  GestureDetector(
-                    child: const Icon(Icons.image),
-                    onTap: () async{await appProvider.imageFromGallery();},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14,),
-
-              //input npm
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 18),
-                child: TextFormField(
-                  controller: appProvider.inputNpmController,
-                  decoration: InputDecoration(
-                    label: Text(appProvider.npmLabel),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 14,),
-
-              //input name
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 18),
-                child: TextFormField(
-                  controller: appProvider.inputNameController,
-                  decoration: InputDecoration(
-                    label: Text(appProvider.nameLabel),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 14,),
-
-              //input desc
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 18),
-                child: TextFormField(
-                  controller: appProvider.inputDescController,
-                  decoration: InputDecoration(
-                    label: Text(appProvider.descLabel),
-                  ),
-                  maxLines: 2,
-                ),
-              ),
-
-              const SizedBox(height: 40,),
-
-              Center(
-                child: GestureDetector(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14, horizontal: 18,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xff0F6292),
-                      borderRadius: BorderRadius.circular(50)
-                    ),
-                    child: const Text(
-                      "add data", style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  onTap: (){appProvider.addData();},
-                ),
-              ),
-
-              const SizedBox(height: 40,),
-
-              ListView.builder(
-                itemCount: appProvider.data.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  Model model = appProvider.data[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6 ,horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("${model.npm}",),
-                        GestureDetector(
-                          child: const Icon(Icons.arrow_forward),
-                          onTap: () => appProvider.goToProfileScreen(
-                            context: context,
-                            index: index,
-                            model: model,
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              )
-            ],
-          ),
-        );
-      },
-    );
+  Future getSoilMoisture() async{
+    notifyListeners();
+    return field3model = await ApiService().getField3();
   }
 }
 ```
 
-File ini berisi class dengan nama InputScreen yang merupakan widget consumer dari AppProvider (dari file app_provider.dart). hal ini ditandai dengan penggunaan keyword `Consumer<AppProvider>` pada saat awal pembuatan widget. Tidak ada penulisan bussines logic pada file ini, fungsi dari file ini sepenuhnya menangani tampilan form input data untuk user. Bussines logic akan di tangani oleh AppProvider sehingga setiap widget yang memerlukan bussines logic dapat memanggil fungsi pada AppProvider. Sebagai consumer dari AppProvider, widget pada file ini dapat bereaksi terhadap perubahan state tanpa perlu state management manual didalam masing masing widget child didalamnya. 
-<br><br>
-Penggunaan provider pertamakali dapat dilihat pada fitur upload gambar. Fungsi yang menangai proses upload gambar sudah di definisikan pada class AppProvider sehingga pada widget button (GestureDetector) hanya perlu memanggil fungsi tersebut pada provider dan saat sistem mendeteksi adanya perubahan data (file terupload), sistem akan mengirimkan pemberitahuan telah terjadi perubahan state melalui notifyListener() pada fungsi tersebut. Begitu juga penerapan pada widget lain seperti textformfield, button gesture detector “add data” dan juga gesture detector untuk pindah ke profile screen. 
+Dapat dilihat di dalam provider mendeklarasikan beberapa variabel dan juga function. Variabel dengan tipe String yang bernama thermoMeterImage dan humiditySensorImage, soilAnalysisImage adalah variabel untuk menyimpan path dimana gambar disimpan. Variabel dengan nama field1model, field2model, field3model adalah variabel yang nantinya menampung return saat function yang berada di class ApiService() bernama getField1(), getField2() dan getField3() dipanggil. getField1(), getField2() dan getField3() berjalan saat getTemperature(), getHumidty() dan getSoilMoisture() dipanggil.
 
-<br><br>
-Tambahkan kode pada **_file profile_screen.dart_**
-``` dart
+<br><br><br>
+
+Kemudian buka **_file main.dart_** dan isi dengan kode berikut :
+
+```dart
 import 'package:flutter/material.dart';
-import 'package:mcs_bab_4/providers/app_provider.dart';
+import 'package:mcs_bab_5/providers/app_provider.dart';
+import 'package:mcs_bab_5/screens/opening_screen.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AppProvider>(
-      builder: (context, appProvider, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("Mhs Profile"),
-            actions: [
-              IconButton(
-                onPressed: () => appProvider.deleteData(context: context),
-                icon: const Icon(Icons.delete),
-              ),
-              const SizedBox(width: 8,)
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: [
-                  Image.file(appProvider.imageProfile!),
-
-                  const SizedBox(height: 20,),
-
-                  Text("${appProvider.npm!}"),
-
-                  const SizedBox(height: 20,),
-
-                  Text("${appProvider.name}"),
-
-                  const SizedBox(height: 20,),
-
-                  Text("${appProvider.desc}"),
-                ],
-              ),
-            ),
-          )
-        );
-      },
-    );
-  }
-}
-```
-
-File profile_screen.dart ini memiliki fungsi utama yang sama persis dengan input_screen yaitu hanya menangani tampilan dari program. Pada file ini akan menampilkan detail dari data yang dibawa saat berpindah halaman dari input_screen ke profile_screen. Sebagai consumer dari AppProvider, dapat dilihat tidak ada penulisan proses logika pada file ini. Logika untuk membawa data list berdasarkan index dari halaman satu ke halaman lain sudah di tangani sepenuhnya oleh AppProvider. File ini hanya perlu memanggil property yang berisi data yang sudah di bawa.
-
-<br><br>
-Ubahlah kode pada **_file main.dart_**
-``` dart
-import 'package:flutter/material.dart';
-import 'package:mcs_bab_4/providers/app_provider.dart';
-import 'package:mcs_bab_4/screens/input_screen.dart';
-import 'package:provider/provider.dart';
-
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -412,31 +347,235 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => AppProvider(),
-        ),
+        ChangeNotifierProvider<AppProvider>(
+          create: (context) => AppProvider()
+            ..getTemperature()
+            ..getHumidity()
+            ..getSoilMoisture(),
+        )
       ],
       child: MaterialApp(
-        title: 'State Management Provider',
+        title: 'Mcs Bab 5',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const InputScreen(),
+        home: const OpeningScreen()
       ),
     );
   }
 }
 ```
-Seperti pada project flutter lainnya. File main.dart merupakan file utama yang akan dijalankan pertama kali ketika program dieksekusi. Jika pada project sebelumnya method widget build yang menangani rendering widget mengembalikan Widget MaterialApp, pada project ini yang dikembalikan adalah widget MultiProvider yang memungkinkan penggunaan beberapa provider. Menggunakan parameter Providers untuk mendefinisikan provider yang akan digunakan dalam bentuk list. Dalam kasus ini didefinisikan ChangeNotifierProvider yang merupakan provider yang akan menangani ChangeNotifier yang sudah digunakan pada saat membuat method. ChangeNotifierProvider menyediakan instance dari class AppProvider yang akan digunakan pada aplikasi sebagai state management.
 
-***
+Dapat dilihat ada code ..getTemperature, ..getHumidty() dan ..getSoilMoisture(). Bentuk penulisan tersebut memiliki tujuan agar tiga function tersebut langsug berjalan saat aplikasi dibuka.
+
+<br><br><br>
+
+Kemudian buka **_file opening_screen.dart_** dan isi dengan code berikut :
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:mcs_bab_5/providers/app_provider.dart';
+import 'package:provider/provider.dart';
+
+class OpeningScreen extends StatefulWidget {
+  const OpeningScreen({super.key});
+
+  @override
+  State<OpeningScreen> createState() => _OpeningScreenState();
+}
+
+class _OpeningScreenState extends State<OpeningScreen> {
+
+  @override
+  void initState() {
+    Provider.of<AppProvider>(context, listen: false,).getTemperature();
+    Provider.of<AppProvider>(context, listen: false,).getHumidity();
+    Provider.of<AppProvider>(context, listen: false,).getSoilMoisture();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AppProvider>(
+      builder: (context, appProvider, child) {
+        return Scaffold(
+          appBar: AppBar(
+          title: Text("Agro Tech" , style: appProvider.whiteRoboto14Bold,),
+            centerTitle: true,
+            backgroundColor: appProvider.mainColor,
+          ),
+          body: Center(
+            child: ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  width: double.infinity,
+                  child: Text(
+                    appProvider.loremIpsum,
+                    style: appProvider.roboto14Bold,
+                    textAlign: TextAlign.justify,),
+                ),
+
+                const SizedBox(height: 30,),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          color: appProvider.mainColor,
+                        ),
+                        child: Text("Continue", style: appProvider.whiteRoboto14Bold,),
+                      ),
+                      onTap: () {
+                        appProvider.gotoMainScreen(context: context);
+                      },
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+Di bagian initState() function getTemperature(), getHumidty() dan getSoilMoisture() dipanggil lagi karena walaupun saat inisialisasi provider tiga function tersebut sudah dipanggil, hal tersebut tidak dapat menjadi jaminan bahwa function yang dipanggil dapat berjalan.
+
+<br><br><br>
+
+Kemudian buka **_file read_field.dart_** dan isi dengan code berikut :
+
+```dart
+import 'package:flutter/material.dart';
+
+class ReadField extends StatelessWidget {
+  String result;
+  Color color;
+  String image;
+
+  ReadField({
+    super.key,
+    required this.result,
+    required this.color,
+    required this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color, width: 4),
+      ),
+      child:
+      Column(
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 5,
+            height: MediaQuery.of(context).size.width / 5,
+            child: Image.asset(image, fit: BoxFit.fill,),
+          ),
+          const SizedBox(height: 14,),
+          Center(child: Text(result),),
+        ],
+      ),
+    );
+  }
+}
+```
+
+Di class ReafField() adalah widget yang nantinya akan digunakan di halaman aplikasi saat membaca field dari channel thingspeak. Dengan adanya class ReadField() ketika ingin menggunakan widget hanya perlu memanggil class ReafField() saja, nanti constructor yang ada di class ReafField() hanya perlu diisi saat dipanggil. Terdapat 3 bagian di dalam constructor yang harus diisi, result adalah untuk menampilkan data dari field channel thingspeak, color adalah warna untuk border widget yang dibangun dan image untuk menampilkan gambar pada widget tersebut.
+
+<br><br><br>
+
+Kemudian buka **_file main_screen.dart_** dan isi dengan code berikut :
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:mcs_bab_5/providers/app_provider.dart';
+import 'package:mcs_bab_5/widgets/read_field.dart';
+import 'package:provider/provider.dart';
+
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AppProvider>(
+      builder: (context, appProvider, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Agro Tech" , style: appProvider.whiteRoboto14Bold,),
+            centerTitle: true,
+            automaticallyImplyLeading: false,
+            backgroundColor: appProvider.mainColor,
+          ),
+          body: Center(
+            child: ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                // temperature
+                ReadField(
+                  result: appProvider.field1model!.field1,
+                  color: appProvider.mainColor,
+                  image: appProvider.thermoMeterImage,
+                ),
+
+                const SizedBox(height: 20,),
+
+                //humidity
+                ReadField(
+                  result: appProvider.field2model!.field2,
+                  color: appProvider.mainColor,
+                  image: appProvider.humiditySensorImage,
+                ),
+
+                const SizedBox(height: 20,),
+
+                //soil moisture
+                ReadField(
+                  result: appProvider.field3model!.field3,
+                  color: appProvider.mainColor,
+                  image: appProvider.soilAnalysisImage,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+Dari class ini dibuat suatu halaman untuk menampilkan data yang ada di Thingspeak melalui JSON. Widget yang digunakan adalah ReadField dan penggunaannya hanya perlu memanggil classnya saja. Ketika class ReadField() dipanggil, class ReadField() memiliki constructor yang di dalamnya terdapat 3 bagian yang harus diisi, result diisi dengan nilai field yang didapat dari channel Thingspeak, color diisi dengan warna, image diisi dengan gambar yang sudah disiapkan.
+
+---
+
 ## LAPORAN PENDAHULUAN (LP)
-1. Sebutkan macam-macam state management 
-2. Apa peran dari state management dalam pembangunan aplikasi 
-3. Jelaskan apa kelebihan state management Provider dengan state management lainnya 
-4. Jelaskan apa kekurangan state management Provider dengan state management lainnya 
+
+1. Berikan penjelasan apa itu Thingspeak!
+2. Berikan penjelasan apa itu JSON!
+3. Berikan penjelasan apa itu serialisasi dan deserialisasi pada JSON!
+4. Berikan macam-macam cara consume API dan berikan penjelasannya!
 
 ## LAPORAN AKHIR (LA)
-1. Berikan kesimpulan pada Bab 4!
+
+1. Berikan kesimpulan pada Bab 5!
