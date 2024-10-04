@@ -27,7 +27,7 @@ go get -u "github.com/joho/godotenv"
 ```
 
 Buat root project dengan folder dan file sebagai berikut : <br>
-<img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%207/roo%20project.png" width="280" height="400"/> <br>
+<img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%207/roo%20project.png" width="250" height="400"/> <br>
 
 Buka **_file statusEntity.go_** dan isi dengan code berikut :
 
@@ -318,8 +318,10 @@ Buka aplikasi postman dan jalankan endpoint dengan rute yang sudah dibuat
 Cek di aplikasi pgAdmin 4 untuk melihat hasilnya
 
 <br>
-<img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%207/cek%20di%20pgadmin%204.png" width="500" height="280"/>
-<br><br><br>
+<div align="center">
+    <img src="https://github.com/Rokel15/GUNADARMA-ASCL-MCS/blob/dev-aini/images/gambar-gambar%20bab%207/cek%20di%20pgadmin%204.png" width="500" height="280"/>
+</div>
+<br>
 
 ---
 
