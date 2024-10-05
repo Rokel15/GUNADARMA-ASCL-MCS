@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mcs_bab_8/pages/home_page.dart';
 import 'package:mcs_bab_8/providers/card_bridge_provider.dart';
+import 'package:mcs_bab_8/providers/servo_controller_provider.dart';
+import 'package:mcs_bab_8/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -8,6 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CardBridgeProvider()),
+        ChangeNotifierProvider(create: (context) => ServoControllerProvider(),),
       ],
       child: const MyApp(),
     ),
@@ -24,8 +26,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
       debugShowCheckedModeBanner: false,
+      home: HomeScreen(),
     );
   }
 }
