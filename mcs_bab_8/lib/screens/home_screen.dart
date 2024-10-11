@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:mcs_bab_8/models/card_bridge_model.dart';
 import 'package:mcs_bab_8/providers/card_bridge_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -111,7 +112,10 @@ class _HomePageState extends State<HomeScreen> {
                                 Text(cardBridgeProvider.cardBridgeModel!.result[index].id),
                                 GestureDetector(
                                   child: const Icon(Icons.delete),
-                                  onTap: () {},
+                                  onTap: () {
+                                    cardBridgeProvider.deleteUid(uid: cardBridgeProvider.cardBridgeModel!.result[index].id);
+                                    print(cardBridgeProvider.cardBridgeModel!.result[index].id);
+                                  },
                                 )
                               ],
                             ),

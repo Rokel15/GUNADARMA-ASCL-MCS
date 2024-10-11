@@ -16,7 +16,7 @@ class CardApiService {
 
   Future deleteCard({required String idCard}) async{
     try{
-      final response = await dio.delete("${cardBridgeUrl}/delete/$idCard");
+      final response = await dio.delete("${cardBridgeUrl}/card/delete/$idCard");
       return response.data;
     } catch(e){
       rethrow;

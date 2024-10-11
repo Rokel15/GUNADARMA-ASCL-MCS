@@ -13,8 +13,14 @@ class CardBridgeProvider extends ChangeNotifier{
     }
   }
 
-  Future getTt() async{
-    await CardApiService().getUid();
+  // Future getTt() async{
+  //   await CardApiService().getUid();
+  //   notifyListeners();
+  // }
+
+
+  Future deleteUid({required String uid}) async{
+    await CardApiService().deleteCard(idCard: uid);
     notifyListeners();
   }
 }
