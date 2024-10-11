@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcs_bab_8/models/card_bridge_model.dart';
+import 'package:flutter/rendering.dart';
 import 'package:mcs_bab_8/providers/card_bridge_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -12,18 +12,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomePageState extends State<HomeScreen> {
   @override
-  // void initState() {
-  //   super.initState();
-  //   // Fetch data from API saat initState
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     Provider.of<CardBridgeProvider>(context, listen: false).fetchCardData();
-  //   });
-  // }
-  //
-  // // Fungsi untuk me-refresh data
-  // Future<void> _refreshData() async {
-  //   await Provider.of<ServoProvider>(context, listen: false).fetchCardData();
-  // }
+
+  void initState() {
+    // TODO: implement initState
+    Provider.of<CardBridgeProvider>(context, listen: false).getUid();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +27,10 @@ class _HomePageState extends State<HomeScreen> {
           appBar: AppBar(
             title: const Text('Flutter Servo & Cards Control', style: TextStyle(color: Colors.white),),
             backgroundColor: Color(0xff0B192C),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white,),
-                onPressed: (){}, // Memanggil refresh secara manual lewat tombol
-              ),
-            ],
           ),
           body: Column(
             children: [
-              const SizedBox(height: 30,),
+              const SizedBox(height: 50,),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -80,72 +68,62 @@ class _HomePageState extends State<HomeScreen> {
               const SizedBox(height: 30,),
 
               Text(
-                "Servo Status:"
+                "Servo Status :"
                 //  ${servoProvider.datasServo}",
                 , style: const TextStyle(fontSize: 20),
               ),
 
-              const SizedBox(height: 30,),
+              const SizedBox(height: 40,),
 
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                    // color: Colors.black,
+                decoration: const BoxDecoration(
                     border: Border(top: BorderSide(width: 3,color: Colors.black)),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40), topRight: Radius.circular(40),
                     )
                 ),
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                child: const Column(
                   children: [
-                    const SizedBox(height: 30,),
-                    const SizedBox(height: 30,),
-                    const SizedBox(height: 30,),
-                    const SizedBox(height: 30,),
-
+                    SizedBox(height: 30,),
+                    Text("Card IDs:"),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 40),
+              Container(),
 
-              // ListView.builder(
-              //   shrinkWrap: true,
-              //   physics: NeverScrollableScrollPhysics(),
-              //   itemCount: cardBridgeProvider.cardBridgeModel?.result.length,
-              //   itemBuilder: (context, index) {
-              //     if (cardBridgeProvider.cardBridgeModel != null) {
-              //       return Text("${cardBridgeProvider.cardBridgeModel!.result}");
-              //     } else{
-              //       return Text("ss");
-              //     }
-              //   },
-              // ),
-
-              const SizedBox(height: 40),
-              // const Text("Card IDs:"),
-              // Expanded(
-                // Menambahkan RefreshIndicator agar bisa melakukan pull-to-refresh
-                // child: RefreshIndicator(
-                //   onRefresh: _refreshData, // Menyegarkan data saat pull-to-refresh
-                //   child: Container(
-                //     height: 200, // Tentukan tinggi area scroll
-                //     decoration: BoxDecoration(
-                //       border: Border.all(color: Colors.grey), // Memberikan batas di sekitar field
-                //     ),
-                //     child: ListView.builder(
-                //       itemCount: servoProvider.cardIds.length,
-                //       itemBuilder: (context, index) {
-                //         return ListTile(
-                //           title: Text(servoProvider.cardIds[index]), // Menampilkan setiap id yang difetch
-                //         );
-                //       },
-                //     ),
-                //   ),
-                // ),
-              // ),
+              Expanded(
+                child: StreamBuilder(
+                  stream: cardBridgeProvider.getUid(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: cardBridgeProvider.cardBridgeModel!.result.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(cardBridgeProvider.cardBridgeModel!.result[index].id),
+                                GestureDetector(
+                                  child: const Icon(Icons.delete),
+                                  onTap: () {},
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    } else{
+                      return const Center(child: Text("no data to display"));
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         );

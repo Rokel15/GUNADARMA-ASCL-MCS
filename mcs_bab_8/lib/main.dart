@@ -5,15 +5,7 @@ import 'package:mcs_bab_8/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CardBridgeProvider()),
-        ChangeNotifierProvider(create: (context) => ServoControllerProvider(),),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -21,13 +13,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CardBridgeProvider()),
+        ChangeNotifierProvider(create: (context) => ServoControllerProvider(),),
+      ],
+      child: MaterialApp(
+        title: 'mcs bab 8',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          useMaterial3: true
+        ),
+        debugShowCheckedModeBanner: false,
+        home: HomeScreen(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
     );
   }
 }
