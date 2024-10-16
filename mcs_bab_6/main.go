@@ -20,7 +20,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "liatdibawahlaptop"
+	password = ""
 	dbName   = "praktikum_mcs_bab6"
 )
 
@@ -49,4 +49,5 @@ func main() {
 
 	routers.StartServer().Run(PORT)
 	fmt.Printf("Success Connected")
+	fmt.Printf("Server running on port %v", PORT)
 }

@@ -1,21 +1,21 @@
 // To parse this JSON data, do
 //
-//     final cardBridgeModel = cardBridgeModelFromJson(jsonString);
+//     final servoStatusModel = servoStatusModelFromJson(jsonString);
 
 import 'dart:convert';
 
-CardBridgeModel cardBridgeModelFromJson(String str) => CardBridgeModel.fromJson(json.decode(str));
+ServoStatusModel servoStatusModelFromJson(String str) => ServoStatusModel.fromJson(json.decode(str));
 
-String cardBridgeModelToJson(CardBridgeModel data) => json.encode(data.toJson());
+String servoStatusModelToJson(ServoStatusModel data) => json.encode(data.toJson());
 
-class CardBridgeModel {
+class ServoStatusModel {
   List<Result> result;
 
-  CardBridgeModel({
+  ServoStatusModel({
     required this.result,
   });
 
-  factory CardBridgeModel.fromJson(Map<String, dynamic> json) => CardBridgeModel(
+  factory ServoStatusModel.fromJson(Map<String, dynamic> json) => ServoStatusModel(
     result: List<Result>.from(json["result"].map((x) => Result.fromJson(x))),
   );
 
@@ -25,17 +25,21 @@ class CardBridgeModel {
 }
 
 class Result {
-  String id;
+  int id;
+  int srvStatus;
 
   Result({
     required this.id,
+    required this.srvStatus,
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
     id: json["id"],
+    srvStatus: json["srv_status"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "srv_status": srvStatus,
   };
 }

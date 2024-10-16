@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:mcs_bab_8/models/card_bridge_model.dart';
-import 'package:mcs_bab_8/providers/card_bridge_provider.dart';
+import 'package:mcs_bab_8/providers/app_provider.dart';
+import 'package:mcs_bab_8/widgets/servo_button.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,14 +15,15 @@ class _HomePageState extends State<HomeScreen> {
 
   void initState() {
     // TODO: implement initState
-    Provider.of<CardBridgeProvider>(context, listen: false).getUid();
+    Provider.of<AppProvider>(context, listen: false).getUid();
+    Provider.of<AppProvider>(context, listen: false).getServoStatus();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CardBridgeProvider>(
-      builder: (context, cardBridgeProvider, child) {
+    return Consumer<AppProvider>(
+      builder: (context, appProvider, child) {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Flutter Servo & Cards Control', style: TextStyle(color: Colors.white),),
@@ -33,44 +33,31 @@ class _HomePageState extends State<HomeScreen> {
             children: [
               const SizedBox(height: 50,),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // servoProvider.putData(1); // Set servo to 1
-                    },
-                    child: const Text(
-                      "Set Servo to 1",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                      backgroundColor: Color(0xffFF6500),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // servoProvider.putData(0); // Set servo to 0
-                    },
-                    child: const Text("Set Servo to 0",
-                      style: TextStyle(
-                          color: Colors.white
-                      ),),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                        backgroundColor: Color(0xff1E3E62),
-                    ),
-                  ),
-                ],
+              ServoButton(
+                textLeftButton: appProvider.textLeftButton,
+                textRightButton: appProvider.textRightButton,
+                colorLeftButton: appProvider.colorLeftButton,
+                colorRightButton: appProvider.colorRightButton,
+                onTapLeftButton: () => appProvider.changeServoStatus(status: "0"),
+                onTapRightButton: () => appProvider.changeServoStatus(status: "1"),
               ),
 
               const SizedBox(height: 30,),
 
+              StreamBuilder(
+                stream: appProvider.getServoStatus(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData){
+                    appProvider.servoStatus = appProvider.servoStatusModel!.result[0].srvStatus.toString();
+                    return Container();
+                  } else{
+                    return Container();
+                  }
+                },
+              ),
+
               Text(
-                "Servo Status :"
-                //  ${servoProvider.datasServo}",
+                "Servo Status : ${appProvider.servoStatus}"
                 , style: const TextStyle(fontSize: 20),
               ),
 
@@ -92,29 +79,26 @@ class _HomePageState extends State<HomeScreen> {
                 ),
               ),
 
-              Container(),
-
               Expanded(
                 child: StreamBuilder(
-                  stream: cardBridgeProvider.getUid(),
+                  stream: appProvider.getUid(),
                   builder: (context, snapshot) {
                     if(snapshot.hasData){
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: cardBridgeProvider.cardBridgeModel!.result.length,
+                        itemCount: appProvider.cardBridgeModel!.result.length,
                         itemBuilder: (context, index) {
                           return Container(
                             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(cardBridgeProvider.cardBridgeModel!.result[index].id),
+                                Text(appProvider.cardBridgeModel!.result[index].id),
                                 GestureDetector(
                                   child: const Icon(Icons.delete),
                                   onTap: () {
-                                    cardBridgeProvider.deleteUid(uid: cardBridgeProvider.cardBridgeModel!.result[index].id);
-                                    print(cardBridgeProvider.cardBridgeModel!.result[index].id);
+                                    appProvider.deleteUid(uid: appProvider.cardBridgeModel!.result[index].id);
                                   },
                                 )
                               ],

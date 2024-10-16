@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcs_bab_8/providers/card_bridge_provider.dart';
-import 'package:mcs_bab_8/providers/servo_controller_provider.dart';
+import 'package:mcs_bab_8/providers/app_provider.dart';
 import 'package:mcs_bab_8/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -15,8 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CardBridgeProvider()),
-        ChangeNotifierProvider(create: (context) => ServoControllerProvider(),),
+        ChangeNotifierProvider(create: (_) => AppProvider()),
       ],
       child: MaterialApp(
         title: 'mcs bab 8',
