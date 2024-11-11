@@ -16,7 +16,7 @@ class ServoApiService {
 
   writeServoStatus({required String status}) async {
     try{
-      final response =  await dio.put("$servoControllerUrl/servo/$status");
+      final response =  await dio.put("$servoControllerUrl/servo/update/$status");
       return response.data;
     }catch(e){
       rethrow;
