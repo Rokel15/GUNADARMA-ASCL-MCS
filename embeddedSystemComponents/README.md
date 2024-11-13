@@ -93,13 +93,13 @@ const char* serverURL = "https://srvo-cntrllr-production.up.railway.app/servo/st
 #define SS_PIN  5    // ESP32 pin GPIO5 
 #define RST_PIN 27   // ESP32 pin GPIO27 
 
-const char* ssid = "Hai pi";       // Ganti dengan SSID Wi-Fi kamu
+const char* ssid = "wormhole";       // Ganti dengan SSID Wi-Fi kamu
 const char* password = "farhan08"; // Ganti dengan password Wi-Fi kamu
 
-const char* serverURL = "https://srvo-cntrllr-production.up.railway.app/servo/status";
+const char* serverURL = "http://192.168.100.65:8081/servo/status";
 
-MFRC522 rfid(SS_PIN, RST_PIN);
-Servo myServo;
+MFRC522 rfid(SS_PIN, RST_PIN); // RFID object
+Servo myServo; // Servo object
 
 void setup() {
   Serial.begin(115200);
@@ -121,8 +121,8 @@ void setup() {
 
 void loop() {
   // Check for RFID tag
-  if (rfid.PICC_IsNewCardPresent()) { // new tag is available
-    if (rfid.PICC_ReadCardSerial()) { // NUID has been read
+  if (rfid.PICC_IsNewCardPresent()) { 
+    if (rfid.PICC_ReadCardSerial()) { 
       MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
       Serial.print("RFID/NFC Tag Type: ");
       Serial.println(rfid.PICC_GetTypeName(piccType));
@@ -154,10 +154,14 @@ void loop() {
 void sendUIDToServer(String uid) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String url = "https://card-bridge-production.up.railway.app/card/input/" + uid;
+    String url = "http://192.168.100.65:8080/card/input/" + uid;
     http.begin(url);
+    http.addHeader("Content-Type", "application/json");
 
-    int httpResponseCode = http.POST("");
+    // Membuat body JSON (jika dibutuhkan)
+    String jsonBody = "{\"uid\":\"" + uid + "\"}";
+
+    int httpResponseCode = http.POST(jsonBody);
 
     if (httpResponseCode > 0) {
       String response = http.getString();
@@ -185,13 +189,13 @@ void checkServoStatus() {
       
       // Parse JSON response
       if (payload.indexOf("\"srv_status\":1") != -1) {
-        // If srv_status is 1, move servo to CCW
+        // Jika srv_status adalah 1, gerakkan servo ke CCW
         Serial.println("Servo moving to CCW");
-        myServo.write(0);  // Set angle to CCW
+        myServo.write(0);  // Atur sudut ke CCW (sesuaikan dengan motor servo Anda)
       } else if (payload.indexOf("\"srv_status\":0") != -1) {
-        // If srv_status is 0, move servo to CW
+        // Jika srv_status adalah 0, gerakkan servo ke CW
         Serial.println("Servo moving to CW");
-        myServo.write(180);  // Set angle to CW
+        myServo.write(180);  // Atur sudut ke CW (sesuaikan dengan motor servo Anda)
       } else {
         Serial.println("Unknown status received");
       }
@@ -203,6 +207,7 @@ void checkServoStatus() {
     Serial.println("WiFi Disconnected");
   }
 }
+
 
 ```
 
